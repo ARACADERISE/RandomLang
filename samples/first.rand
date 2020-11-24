@@ -1,0 +1,9 @@
+DEFINE:bruh = 15
+define:second_Bruh = 22
+print(44)
+
+define:noway = 4455
+print(noway)
+
+print(44)
+print(45)
