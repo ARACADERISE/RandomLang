@@ -16,16 +16,16 @@ typedef struct SynTree {
   size_t l_of_trees;
 
   /* If Statement */
-  void** check_val_lval;
-  void** check_val_rval;
-  char** check_action;
+  void* check_val_lval;
+  void* check_val_rval;
+  char* check_action;
   void** or_lvals;
   void** or_actions;
   void** or_rvals;
   void** and_lvals;
   void** and_actions;
   void** and_rvals;
-  size_t amount_of_checks;
+  //size_t amount_of_checks;
   size_t amount_of_or_checks;
   size_t amount_of_and_checks;
 

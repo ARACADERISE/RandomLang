@@ -171,21 +171,12 @@ SynTree_* parse_if_statement(Parser_* parser)
   begin:
   if(parser->tokens->Type == Id)
   {
-    tree->amount_of_checks++;
-    tree->check_val_lval = realloc(
-      tree->check_val_lval,
-      (tree->amount_of_checks+1)*sizeof(*tree->check_val_lval)
-    );
-    tree->check_val_lval[tree->amount_of_checks-1] = parser->tokens->val;
+    tree->check_val_lval = parser->tokens->val;
     parser_get_next_token(parser, Id);
 
     if(parser->tokens->Type == GT)
     {
-      tree->check_action = realloc(
-        tree->check_action,
-        (tree->amount_of_checks+1)*sizeof(*tree->check_action)
-      );
-      tree->check_action[tree->amount_of_checks-1] = parser->tokens->val;
+      tree->check_action = parser->tokens->val;
       parser_get_next_token(parser, GT);
 
       if(parser->tokens->Type == Eof)
@@ -200,11 +191,7 @@ SynTree_* parse_if_statement(Parser_* parser)
         exit(EXIT_SUCCESS);
       } else if(parser->tokens->Type == Intval)
       {
-        tree->check_val_rval = realloc(
-          tree->check_val_rval,
-          (tree->amount_of_checks+1)*sizeof(*tree->check_val_rval)
-        );
-        tree->check_val_rval[tree->amount_of_checks-1] = parser->tokens->val;
+        tree->check_val_rval = parser->tokens->val;
         parser_get_next_token(parser, Intval);
       }
 
@@ -237,6 +224,30 @@ SynTree_* parse_if_statement(Parser_* parser)
 
   if(parser->tokens->Type == RP) parser_get_next_token(parser, RP);
 
+  redo:
+  switch(parser->tokens->Type)
+  {
+    case Print_Keyword:
+    {
+      SynTree_* secondaryTree = parse_print_keyword(parser);
+      tree->l_of_trees++;
+      tree->trees = realloc(
+        tree->trees,
+        (tree->l_of_trees+1)*sizeof(*tree->trees)
+      );
+      tree->trees[tree->l_of_trees-1] = secondaryTree;
+
+      if(parser->tokens->Type != Eof) goto redo;
+      goto end;
+    }
+    default:
+    {
+      fprintf(stderr,"\nSyntax Error:\n\t➥ Unexpected `%s` on line %d\n",parser->tokens->val,parser->lexer->line);
+      exit(EXIT_FAILURE);
+    }
+  }
+
+  end:
   return tree;
 }
 

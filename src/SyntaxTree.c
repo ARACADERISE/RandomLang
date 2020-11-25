@@ -23,7 +23,7 @@ SynTree_* init_tree(int type)
   tree->and_rvals = calloc(1,sizeof(*tree->and_rvals));
   tree->and_actions = calloc(1,sizeof(*tree->and_actions));
   tree->or_actions = calloc(1,sizeof(*tree->or_actions));
-  tree->amount_of_checks = 0;
+  //tree->amount_of_checks = 0;
   tree->amount_of_or_checks = 0;
   tree->amount_of_and_checks = 0;
 

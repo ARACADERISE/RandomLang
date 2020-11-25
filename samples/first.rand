@@ -1,3 +1,3 @@
 define:bruh = 55
-if(bruh > 25)
+if(bruh > 65)
   print(bruh,25,bruh)

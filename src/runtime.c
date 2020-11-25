@@ -32,11 +32,45 @@ SynTree_* run_print_Method(SynTree_* tree, SynTree_* node)
           for(int y = 0; y < node->trees[i]->amount_of_variables; y++)
           {
             if(strcmp(tree->variables_to_print[x],node->trees[i]->variable_names[y])==0) printf("%s\n",(char*)node->trees[i]->variable_values[y]);
-          }
+
+                      }
         }
       }
     }
     if(tree->print_values_length > 0 && val_printed == -1) goto other;
+  }
+  return tree;
+}
+
+SynTree_* run_if_statement(SynTree_* tree, SynTree_* node)
+{
+  for(int i = 0; i < node->l_of_trees; i++)
+  {
+    if(node->trees[i]->amount_of_variables > 0)
+    {
+      for(int x = 0; x < node->trees[i]->amount_of_variables; x++)
+      {
+        if(strcmp(tree->check_val_lval,node->trees[i]->variable_names[x])==0) {
+          if(strcmp(tree->check_action,">")==0)
+          {
+            if(atoi(node->trees[i]->variable_values[x]) > atoi(tree->check_val_rval))
+            {
+              for(int y = 0; y < tree->l_of_trees; y++)
+              {
+                switch(tree->trees[y]->TreeType)
+                {
+                  case Tree_Print: run_print_Method(tree->trees[y], node);break;
+                  default: {
+                    fprintf(stderr,"\nRuntime Error\n\t➥ Uncaught error at if statement\n");
+                    exit(EXIT_FAILURE);
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   }
   return tree;
 }
@@ -47,6 +81,7 @@ SynTree_* check_tree_type(SynTree_* tree, SynTree_* node)
   {
     case Tree_Define: return run_define(tree);
     case Tree_Print: return run_print_Method(tree,node);
+    case Tree_IfStatement: return run_if_statement(tree,node);
     default: break; // Tree_eof
   }
   return tree;
