@@ -13,6 +13,24 @@ Lexer_* init_lexer(char* code)
   return lexer;
 }
 
+void peek_next(Lexer_* lexer)
+{
+  if(!(lexer->source_code[lexer->index+1] == '\0'))
+  {
+    lexer->index++;
+    lexer->curr_char = lexer->source_code[lexer->index];
+  }
+}
+
+void peek_back(Lexer_* lexer)
+{
+  if(!(lexer->source_code[lexer->index-1] == '\0'))
+  {
+    lexer->index--;
+    lexer->curr_char = lexer->source_code[lexer->index];
+  }
+}
+
 void move_pointer(Lexer_* lexer)
 {
   if(lexer->curr_char != '\0' && !(lexer->index > strlen(lexer->source_code)))
@@ -95,6 +113,7 @@ Tokens_* get_next_token(Lexer_* lexer)
       char* val = gather_keyword(lexer);
       if(strcmp(val,"DEFINE")==0||strcmp(val,"define")==0) return init_token(Define_Keyword, val);
       else if(strcmp(val,"PRINT")==0 || strcmp(val,"print")==0) return init_token(Print_Keyword,val);
+      else if(strcmp(val,"IF")==0 || strcmp(val,"if")==0) return init_token(IfStatement,"if");
       return init_token(Id,val);
     }
     switch(lexer->curr_char)
@@ -105,6 +124,20 @@ Tokens_* get_next_token(Lexer_* lexer)
       case '\n': move_pointer(lexer);goto redo;
       case '(':return advance_with_token(lexer, LP, "(");
       case ')':return advance_with_token(lexer, RP, ")");
+      case '>':return advance_with_token(lexer, GT, ">");
+      case '<':return advance_with_token(lexer, LT, "<");
+      case '&':
+      {
+        peek_next(lexer);
+
+        if(lexer->curr_char == '&')
+        {
+          return advance_with_token(lexer, And, "&&");
+        }
+
+        peek_back(lexer);
+        break;
+      }
       default:break;
     }
 

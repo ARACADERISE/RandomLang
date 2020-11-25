@@ -17,10 +17,9 @@ SynTree_* run_print_Method(SynTree_* tree, SynTree_* node)
     {
       printf("%s\n",tree->values_to_print[i]);
     }
-
     if(tree->print_length > 0 && var_printed == -1) goto print_variables;
   }
-  if(tree->print_length > 0 && tree->came_first == 0)
+  if(tree->print_length > 0 && tree->came_first == 0 && var_printed == -1)
   {
     print_variables:
     var_printed = 0;

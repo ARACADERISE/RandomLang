@@ -13,6 +13,20 @@ SynTree_* init_tree(int type)
   tree->variable_names = calloc(1,sizeof(*tree->variable_names));
   tree->variable_values = calloc(1,sizeof(*tree->variable_values));
 
+  /* If statement */
+  tree->check_val_lval = calloc(1,sizeof(*tree->check_val_lval));
+  tree->check_val_rval = calloc(1,sizeof(*tree->check_val_rval));
+  tree->check_action = calloc(1,sizeof(*tree->check_action));
+  tree->or_lvals = calloc(1,sizeof(*tree->or_lvals));
+  tree->or_rvals = calloc(1,sizeof(*tree->or_rvals));
+  tree->and_lvals = calloc(1,sizeof(*tree->and_lvals));
+  tree->and_rvals = calloc(1,sizeof(*tree->and_rvals));
+  tree->and_actions = calloc(1,sizeof(*tree->and_actions));
+  tree->or_actions = calloc(1,sizeof(*tree->or_actions));
+  tree->amount_of_checks = 0;
+  tree->amount_of_or_checks = 0;
+  tree->amount_of_and_checks = 0;
+
   // print statement
   tree->print_length = 0;
   tree->came_first = -1;

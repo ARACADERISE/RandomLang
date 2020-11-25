@@ -149,12 +149,104 @@ SynTree_* parse_print_keyword(Parser_* parser)
   return tree;
 }
 
+SynTree_* parse_if_statement(Parser_* parser)
+{
+
+  SynTree_* tree = init_tree(Tree_IfStatement);
+
+  parser_get_next_token(parser, IfStatement);
+
+  if(parser->tokens->Type == Colon)
+  {
+    parser_get_next_token(parser,Colon);
+  } else if(parser->tokens->Type == LP)
+  {
+    parser_get_next_token(parser, LP);
+  } else 
+  {
+    fprintf(stderr,"\nSyntax Error:\n\t➥ Expected `:` or `()` on line %d\n",parser->lexer->line);
+    exit(EXIT_FAILURE);
+  }
+
+  begin:
+  if(parser->tokens->Type == Id)
+  {
+    tree->amount_of_checks++;
+    tree->check_val_lval = realloc(
+      tree->check_val_lval,
+      (tree->amount_of_checks+1)*sizeof(*tree->check_val_lval)
+    );
+    tree->check_val_lval[tree->amount_of_checks-1] = parser->tokens->val;
+    parser_get_next_token(parser, Id);
+
+    if(parser->tokens->Type == GT)
+    {
+      tree->check_action = realloc(
+        tree->check_action,
+        (tree->amount_of_checks+1)*sizeof(*tree->check_action)
+      );
+      tree->check_action[tree->amount_of_checks-1] = parser->tokens->val;
+      parser_get_next_token(parser, GT);
+
+      if(parser->tokens->Type == Eof)
+      {
+        fprintf(stderr,"\nParsing Error:\n\t➥ Unexpected End Of File(EOF) on line %d\n",parser->lexer->line);
+        exit(EXIT_FAILURE);
+      }
+
+      if(parser->tokens->Type == Id)
+      {
+        printf("Here");
+        exit(EXIT_SUCCESS);
+      } else if(parser->tokens->Type == Intval)
+      {
+        tree->check_val_rval = realloc(
+          tree->check_val_rval,
+          (tree->amount_of_checks+1)*sizeof(*tree->check_val_rval)
+        );
+        tree->check_val_rval[tree->amount_of_checks-1] = parser->tokens->val;
+        parser_get_next_token(parser, Intval);
+      }
+
+      if(parser->tokens->Type == And)
+      {
+        parser_get_next_token(parser, And);
+
+        if(parser->tokens->Type == Id)
+        {
+          tree->amount_of_and_checks++;
+          tree->and_lvals = realloc(
+            tree->and_lvals,
+            (tree->amount_of_and_checks+1)*sizeof(*tree->and_lvals)
+          );
+          tree->and_lvals[tree->amount_of_and_checks-1] = parser->tokens->val;
+          parser_get_next_token(parser, Id);
+        } else if(parser->tokens->Type == Intval)
+        {
+          tree->amount_of_and_checks++;
+          tree->and_lvals = realloc(
+            tree->and_lvals,
+            (tree->amount_of_and_checks+1)*sizeof(*tree->and_lvals)
+          );
+          tree->and_lvals[tree->amount_of_and_checks-1] = parser->tokens->val;
+          parser_get_next_token(parser, Intval);
+        }
+      }
+    }
+  }
+
+  if(parser->tokens->Type == RP) parser_get_next_token(parser, RP);
+
+  return tree;
+}
+
 SynTree_* parse_current_state(Parser_* parser)
 {
   switch(parser->tokens->Type)
   {
     case Define_Keyword: return parse_define_keyword(parser);
     case Print_Keyword: return parse_print_keyword(parser);
+    case IfStatement: return parse_if_statement(parser);
     default:break; // error here, will get to that later on
   }
   return init_tree(Tree_eof);
