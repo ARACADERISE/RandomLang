@@ -13,22 +13,24 @@ Lexer_* init_lexer(char* code)
   return lexer;
 }
 
-void peek_next(Lexer_* lexer)
+char peek_next(Lexer_* lexer)
 {
   if(!(lexer->source_code[lexer->index+1] == '\0'))
   {
     lexer->index++;
     lexer->curr_char = lexer->source_code[lexer->index];
   }
+  return lexer->curr_char;
 }
 
-void peek_back(Lexer_* lexer)
+char peek_back(Lexer_* lexer)
 {
   if(!(lexer->source_code[lexer->index-1] == '\0'))
   {
     lexer->index--;
     lexer->curr_char = lexer->source_code[lexer->index];
   }
+  return lexer->curr_char;
 }
 
 void move_pointer(Lexer_* lexer)
@@ -97,6 +99,29 @@ char* get_number(Lexer_* lexer)
   return number;
 }
 
+void comment(Lexer_* lexer)
+{
+  do {
+    if(lexer->curr_char == '\n' || lexer->curr_char == '\0') return;
+    move_pointer(lexer);
+  } while(1);
+}
+void multi_line_comment(Lexer_* lexer)
+{
+  do {
+    move_pointer(lexer);
+    if(lexer->curr_char == '*')
+    {
+      move_pointer(lexer);
+      if(lexer->curr_char == '/') return move_pointer(lexer);
+      else {
+        fprintf(stderr,"\nSyntax Error\n\t➥ Expected `/` for end of multi-line comment on line %d\n",lexer->line);
+        exit(EXIT_FAILURE);
+      }
+    }
+  } while(1);
+}
+
 Tokens_* get_next_token(Lexer_* lexer)
 {
   do {
@@ -114,10 +139,26 @@ Tokens_* get_next_token(Lexer_* lexer)
       if(strcmp(val,"DEFINE")==0||strcmp(val,"define")==0) return init_token(Define_Keyword, val);
       else if(strcmp(val,"PRINT")==0 || strcmp(val,"print")==0) return init_token(Print_Keyword,val);
       else if(strcmp(val,"IF")==0 || strcmp(val,"if")==0) return init_token(IfStatement,"if");
+      else if(strcmp(val,"endif")==0 || strcmp(val,"ENDIF")==0) return init_token(EndIf,"endif");
       return init_token(Id,val);
     }
     switch(lexer->curr_char)
     {
+      case '/':
+      {
+        if(peek_next(lexer)=='/')
+        {
+          comment(lexer);
+          goto redo;
+        }
+        peek_back(lexer);
+        if(peek_next(lexer)=='*')
+        {
+          multi_line_comment(lexer);
+          goto redo;
+        }
+        peek_back(lexer);
+      }
       case ':':return advance_with_token(lexer,Colon,":");
       case '=':return advance_with_token(lexer,Equals,convert_to_str(lexer->curr_char));
       case ',':return advance_with_token(lexer, Comma, ",");

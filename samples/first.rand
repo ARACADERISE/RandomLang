@@ -1,3 +1,9 @@
+
+/*
+  This is a random language I made just for the heck of it :D
+*/
 define:bruh = 55
-if(bruh > 65)
+if(bruh > 54)
   print(bruh,25,bruh)
+  // else statement here
+ENDIF

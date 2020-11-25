@@ -10,6 +10,7 @@ typedef struct Tokens {
     Equals,
     Define_Keyword,
     IfStatement,
+    EndIf,
     Colon,
     GT,
     LT,

@@ -42,6 +42,21 @@ SynTree_* run_print_Method(SynTree_* tree, SynTree_* node)
   return tree;
 }
 
+void check(SynTree_* tree, SynTree_* node)
+{
+  for(int y = 0; y < tree->l_of_trees; y++)
+  {
+    switch(tree->trees[y]->TreeType)
+    {
+      case Tree_Print: run_print_Method(tree->trees[y], node);break;
+      default: {
+        fprintf(stderr,"\nRuntime Error\n\t➥ Uncaught error at if statement\n");
+        exit(EXIT_FAILURE);
+      }
+    }
+  }
+}
+
 SynTree_* run_if_statement(SynTree_* tree, SynTree_* node)
 {
   for(int i = 0; i < node->l_of_trees; i++)
@@ -51,21 +66,19 @@ SynTree_* run_if_statement(SynTree_* tree, SynTree_* node)
       for(int x = 0; x < node->trees[i]->amount_of_variables; x++)
       {
         if(strcmp(tree->check_val_lval,node->trees[i]->variable_names[x])==0) {
+          char* val = node->trees[i]->variable_values[x];
           if(strcmp(tree->check_action,">")==0)
           {
-            if(atoi(node->trees[i]->variable_values[x]) > atoi(tree->check_val_rval))
+            if(isdigit(val[0])&&atoi(node->trees[i]->variable_values[x]) > atoi(tree->check_val_rval))
             {
-              for(int y = 0; y < tree->l_of_trees; y++)
-              {
-                switch(tree->trees[y]->TreeType)
-                {
-                  case Tree_Print: run_print_Method(tree->trees[y], node);break;
-                  default: {
-                    fprintf(stderr,"\nRuntime Error\n\t➥ Uncaught error at if statement\n");
-                    exit(EXIT_FAILURE);
-                  }
-                }
-              }
+              check(tree,node);
+            }
+          }
+          if(strcmp(tree->check_action,"<")==0)
+          {
+            if(isdigit(val[0])&&atoi(node->trees[i]->variable_values[x]) < atoi(tree->check_val_rval))
+            {
+              check(tree,node);
             }
           }
         }
